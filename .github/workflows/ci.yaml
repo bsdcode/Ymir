@@ -177,9 +177,9 @@ jobs:
   build-freebsd-x64:
     name: freebsd-x64
     runs-on: ubuntu-latest
-    # strategy:
-    #   matrix:
-    #     architecture: [ arm64, x86-64 ]
+    strategy:
+      matrix:
+        architecture: [ arm64, x86-64 ]
 
     steps:
       - uses: actions/checkout@v4
@@ -195,8 +195,7 @@ jobs:
       - uses: cross-platform-actions/action@v0.29.0
         with:
           operating_system: freebsd
-          # architecture: ${{ matrix.architecture }}
-          architecture: x86-64
+          architecture: ${{ matrix.architecture }}
           version: '14.3'
           run: |
             sudo pkg upgrade -y

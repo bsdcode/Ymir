@@ -77,7 +77,7 @@ add_library(ymir-core
     include/ymir/hw/smpc/rtc.hpp
     include/ymir/hw/smpc/smpc.hpp
     include/ymir/hw/smpc/smpc_internal_callbacks.hpp
-    
+
     include/ymir/hw/smpc/peripheral/peripheral_base.hpp
     include/ymir/hw/smpc/peripheral/peripheral_callbacks.hpp
     include/ymir/hw/smpc/peripheral/peripheral_defs.hpp
@@ -107,7 +107,7 @@ add_library(ymir-core
     include/ymir/media/media_defs.hpp
     include/ymir/media/saturn_header.hpp
     include/ymir/media/subheader.hpp
-    
+
     include/ymir/media/loader/loader.hpp
     include/ymir/media/loader/loader_bin_cue.hpp
     include/ymir/media/loader/loader_chd.hpp
@@ -146,7 +146,7 @@ add_library(ymir-core
     include/ymir/sys/system.hpp
     include/ymir/sys/system_features.hpp
     include/ymir/sys/system_internal_callbacks.hpp
-    
+
     include/ymir/util/arith_ops.hpp
     include/ymir/util/backup_datetime.hpp
     include/ymir/util/bit_ops.hpp
@@ -184,16 +184,16 @@ add_library(ymir-core
     src/ymir/hw/cdblock/cdblock.cpp
     src/ymir/hw/cdblock/cdblock_devlog.hpp
     src/ymir/hw/cdblock/cdblock_partition_manager.cpp
-    
+
     src/ymir/hw/m68k/m68k.cpp
     src/ymir/hw/m68k/m68k_addr_modes.hpp
     src/ymir/hw/m68k/m68k_decode.cpp
     src/ymir/hw/m68k/m68k_disasm.cpp
-    
+
     src/ymir/hw/scsp/scsp.cpp
     src/ymir/hw/scsp/scsp_dsp.cpp
     src/ymir/hw/scsp/scsp_slot.cpp
-    
+
     src/ymir/hw/scu/scu.cpp
     src/ymir/hw/scu/scu_devlog.hpp
     src/ymir/hw/scu/scu_dsp.cpp
@@ -208,7 +208,7 @@ add_library(ymir-core
     src/ymir/hw/smpc/peripheral/peripheral_impl_mission_stick.cpp
 
     src/ymir/hw/sh2/sh2.cpp
-    
+
     src/ymir/hw/sh2/sh2_decode.cpp
     src/ymir/hw/sh2/sh2_disasm.cpp
 
@@ -263,54 +263,57 @@ endif ()
 
 
 # Build precompiled header
-target_precompile_headers(ymir-core
-    PUBLIC
-        <algorithm>
-        <array>
-        <atomic>
-        <bit>
-        <cassert>
-        <charconv>
-        <cinttypes>
-        <climits>
-        <cmath>
-        <concepts>
-        <condition_variable>
-        <cstddef>
-        <cstdint>
-        <cstdlib>
-        <deque>
-        <filesystem>
-        <fstream>
-        <functional>
-        <initializer_list>
-        <iosfwd>
-        <iostream>
-        <limits>
-        <memory>
-        <mutex>
-        <new>
-        <numeric>
-        <optional>
-        <queue>
-        <set>
-        <span>
-        <sstream>
-        <string>
-        <thread>
-        <type_traits>
-        <unordered_map>
-        <unordered_set>
-        <utility>
-        <variant>
-        <vector>
+# Disable on FreeBSD arm64, see https://github.com/llvm/llvm-project/issues/69524
+if (NOT((CMAKE_SYSTEM_NAME MATCHES "FreeBSD") AND (CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")))
+    target_precompile_headers(ymir-core
+        PUBLIC
+            <algorithm>
+            <array>
+            <atomic>
+            <bit>
+            <cassert>
+            <charconv>
+            <cinttypes>
+            <climits>
+            <cmath>
+            <concepts>
+            <condition_variable>
+            <cstddef>
+            <cstdint>
+            <cstdlib>
+            <deque>
+            <filesystem>
+            <fstream>
+            <functional>
+            <initializer_list>
+            <iosfwd>
+            <iostream>
+            <limits>
+            <memory>
+            <mutex>
+            <new>
+            <numeric>
+            <optional>
+            <queue>
+            <set>
+            <span>
+            <sstream>
+            <string>
+            <thread>
+            <type_traits>
+            <unordered_map>
+            <unordered_set>
+            <utility>
+            <variant>
+            <vector>
 
-        <fmt/format.h>
-        <fmt/std.h>
-        <fmt/xchar.h>
+            <fmt/format.h>
+            <fmt/std.h>
+            <fmt/xchar.h>
 
-        <mio/mmap.hpp>
-)
+            <mio/mmap.hpp>
+    )
+endif()
 
 ## Define version macros
 if (DEFINED Ymir_VERSION_PRERELEASE AND NOT Ymir_VERSION_PRERELEASE STREQUAL "")
