@@ -13,8 +13,10 @@
 #elif defined(__APPLE__)
     #include <mach-o/dyld.h>
     #include <pthread.h>
+    #include <vector>
     #include <sys/param.h>
     #include <sys/resource.h>
+    #include <unistd.h>
 #else
     #include <limits.h>
     #include <pthread.h>

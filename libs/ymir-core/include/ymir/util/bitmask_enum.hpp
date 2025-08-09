@@ -1,5 +1,10 @@
 #pragma once
 
+// TODO: find the correct way to handle this
+#include <fmt/format.h>
+#include <fmt/std.h>
+#include <fmt/xchar.h>
+
 /**
 @file
 @brief Type-safe enum class bitmasks

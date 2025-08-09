@@ -30,6 +30,7 @@
 
 #include <array>
 #include <iosfwd>
+#include <queue>
 #include <span>
 
 namespace ymir::scsp {

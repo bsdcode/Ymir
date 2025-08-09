@@ -10,6 +10,8 @@
 
 #include <lz4.h>
 
+#include <mutex>
+
 namespace app {
 
 RewindBuffer::RewindBuffer() {
