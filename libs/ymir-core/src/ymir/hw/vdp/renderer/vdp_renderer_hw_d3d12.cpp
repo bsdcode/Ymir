@@ -187,7 +187,7 @@ static constexpr size_t kNumFrames = 3;
 
 /// @brief Size of the upload buffers, in bytes.
 /// Should be large enough to fit multiple worst case single transfers, but not waste space needlessly.
-static constexpr UINT64 kUploadBufferSize = (4 + 4 * kNumFrames) * 1024 * 1024;
+static constexpr UINT64 kUploadBufferSize = 128 * 1024 * 1024;
 
 /// @brief A single allocation in an upload buffer.
 struct UploadAllocation {
@@ -4430,7 +4430,7 @@ struct Direct3D12VDPRenderer::Impl {
         return cmdIndex;
     }
 
-    bool VDP1AddSpan(CoordS32 coord0, CoordS32 coord1, const VDP1SpanData &data, bool textured, bool antialias) {
+    bool VDP1AddSpan(CoordS32 coord0, CoordS32 coord1, VDP1SpanData &data, bool textured, bool antialias) {
         // Discard if completely out of bounds
         if (coord0.x() < 0 && coord1.x() < 0) {
             return false;
@@ -4455,10 +4455,6 @@ struct Direct3D12VDPRenderer::Impl {
 
         // Determine span length
         LineStepper line{coord0, coord1};
-
-        // Append span to list
-        FrameContext &frameCtx = frames.GetCurrentFrame();
-        VDP1SpanParams &spanParams = frameCtx.cpuSpanParams[frameCtx.cpuSpanCount];
         const uint32 skip = line.SystemClip(sysClipH, sysClipV);
         const uint32 length = line.Length();
 
@@ -4471,9 +4467,18 @@ struct Direct3D12VDPRenderer::Impl {
         const uint32 fragLimit = isOIT ? kMaxVDP1OITFragmentsPerDispatch : kMaxVDP1FragmentsPerDispatch;
 
         // Submit spans now if the total fragment count would exceed the limit
+        FrameContext &frameCtx = frames.GetCurrentFrame();
         if (frameCtx.cpuSpanPrefixSums[frameCtx.cpuSpanCount] + length >= fragLimit) {
             VDP1SubmitSpans();
+
+            // Readd command
+            frameCtx.cpuCmdParams[0] = frameCtx.cpuCmdParams[data.cmdIndex];
+            frameCtx.cpuCmdCount = 1;
+            data.cmdIndex = 0;
         }
+
+        // Append span to list
+        VDP1SpanParams &spanParams = frameCtx.cpuSpanParams[frameCtx.cpuSpanCount];
 
         const auto [x0, y0] = coord0;
         const auto [x1, y1] = coord1;
@@ -4481,9 +4486,6 @@ struct Direct3D12VDPRenderer::Impl {
         spanParams.coord0 = {x0, y0};
         spanParams.coord1 = {x1, y1};
         spanParams.cmdIndex = data.cmdIndex;
-
-        const uint32 dx = abs(x1 - x0);
-        const uint32 dy = abs(y1 - y0);
         spanParams.skip = skip;
         spanParams.attrs.antialias = antialias;
 
@@ -4512,6 +4514,11 @@ struct Direct3D12VDPRenderer::Impl {
         ++frameCtx.cpuSpanCount;
         if (frameCtx.cpuSpanCount >= frameCtx.cpuSpanParams.size()) {
             VDP1SubmitSpans();
+
+            // Readd command
+            frameCtx.cpuCmdParams[0] = frameCtx.cpuCmdParams[data.cmdIndex];
+            frameCtx.cpuCmdCount = 1;
+            data.cmdIndex = 0;
         }
 
         // Indicate that the span was drawn
