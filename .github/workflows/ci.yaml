@@ -277,7 +277,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo pkg update -f
           sudo pkg upgrade -y
           sudo pkg install -y cmake evdev-proto git gmake libX11 libXcursor libXext \
             libXfixes libXi libXrandr libXrender libXScrnSaver libXtst libglvnd \
